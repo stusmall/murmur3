@@ -1,0 +1,8 @@
+[package]
+name = "murmur3"
+version = "0.0.1"
+authors = [ "Stu small <stuart.alan.small@gmail.com>" ]
+
+[dependencies]
+byteorder = "0.3.13"
+
