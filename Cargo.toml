@@ -1,7 +1,11 @@
 [package]
 name = "murmur3"
 version = "0.0.2"
-authors = [ "Stu small <stuart.alan.small@gmail.com>" ]
+authors = [ "Stu Small <stuart.alan.small@gmail.com>" ]
+description = "A rust implementation of Murmur3 hash"
+repository = "https://github.com/stusmall/murmur3"
+keywords = ["hash","murmur3","murmur"]
+license = "Apache-2.0"
 
 [dependencies]
 byteorder = "0.4.2"
