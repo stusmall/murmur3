@@ -4,7 +4,6 @@
 extern crate test;
 use test::Bencher;
 use std::io::Cursor;
-use std::fs::File;
 
 extern crate murmur3;
 
