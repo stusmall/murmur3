@@ -17,6 +17,16 @@ fn bench_32(b: &mut Bencher) {
 }
 
 #[bench]
+fn bench_x86_128(b: &mut Bencher) {
+    b.iter(|| {
+        let mut out: [u8; 16] = [0; 16];
+        let string: &[u8] = "Lorem ipsum dolor sit amet, consectetur adipisicing elit".as_bytes();
+        let mut tmp = Cursor::new(&string[0..string.len()]);
+        murmur3::murmur3_x86_128(&mut tmp, 0, &mut out);
+    });
+}
+
+#[bench]
 fn bench_x64_128(b: &mut Bencher) {
     b.iter(|| {
         let mut out: [u8; 16] = [0; 16];
@@ -25,4 +35,3 @@ fn bench_x64_128(b: &mut Bencher) {
         murmur3::murmur3_x64_128(&mut tmp, 0, &mut out);
     });
 }
-

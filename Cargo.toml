@@ -1,6 +1,6 @@
 [package]
 name = "murmur3"
-version = "0.0.2"
+version = "0.1.0"
 authors = [ "Stu Small <stuart.alan.small@gmail.com>" ]
 description = "A rust implementation of Murmur3 hash"
 repository = "https://github.com/stusmall/murmur3"
