@@ -1,3 +1,12 @@
+// Copyright (c) 2016 Stu Small
+//
+// Licensed under the Apache License, Version 2.0
+// <LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0> or the MIT
+// license <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
+
+
 extern crate byteorder;
 
 
@@ -5,9 +14,6 @@ use std::io::Cursor;
 use std::io::Read;
 use byteorder::{LittleEndian, ReadBytesExt, ByteOrder};
 
-
-// TODO: test with using chunks
-// https://doc.rust-lang.org/beta/std/slice/struct.Chunks.html
 
 pub fn murmur3_32(source: &mut Read, seed: u32) -> u32 {
     const C1: u32 = 0x85ebca6b;
