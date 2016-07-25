@@ -15,7 +15,7 @@ use std::io::Read;
 use byteorder::{LittleEndian, ReadBytesExt, ByteOrder};
 
 
-pub fn murmur3_32(source: &mut Read, seed: u32) -> u32 {
+pub fn murmur3_32<T :Read>(source: &mut T, seed: u32) -> u32 {
     const C1: u32 = 0x85ebca6b;
     const C2: u32 = 0xc2b2ae35;
     const R1: u32 = 16;
@@ -74,7 +74,7 @@ fn calc_k(k: u32) -> u32 {
     k.wrapping_mul(C1).rotate_left(R1).wrapping_mul(C2)
 }
 
-pub fn murmur3_x86_128(source: &mut Read, seed: u32, out: &mut [u8]) {
+pub fn murmur3_x86_128<T :Read>(source: &mut T, seed: u32, out: &mut [u8]) {
     const C1: u32 = 0x239b961b;
     const C2: u32 = 0xab0e9789;
     const C3: u32 = 0x38b34ae5;
@@ -222,7 +222,7 @@ fn fmix32(k: u32) -> u32 {
 }
 
 
-pub fn murmur3_x64_128(source: &mut Read, seed: u32, out: &mut [u8]) {
+pub fn murmur3_x64_128<T:Read>(source: &mut T, seed: u32, out: &mut [u8]) {
     const C1: u64 = 0x52dce729;
     const C2: u64 = 0x38495ab5;
     const R1: u32 = 27;
