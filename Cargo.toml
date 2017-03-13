@@ -5,7 +5,7 @@ authors = [ "Stu Small <stuart.alan.small@gmail.com>" ]
 description = "A rust implementation of Murmur3 hash"
 repository = "https://github.com/stusmall/murmur3"
 keywords = ["hash","murmur3","murmur"]
-license = "MIT/Apache-2.0"
+license = "MIT OR Apache-2.0"
 
 
 [dependencies]
