@@ -225,7 +225,7 @@ fn test_static_strings() {
                                }];
 
 
-    for test in tests.into_iter() {
+    for test in &tests {
         let mut out: [u8; 16] = [0; 16];
         assert_eq!(murmur3::murmur3_32(&mut Cursor::new(test.string.as_bytes()), 0),
                    test.hash_32);
