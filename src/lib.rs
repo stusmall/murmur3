@@ -6,14 +6,12 @@
 // option. All files in the project carrying such notice may not be copied,
 // modified, or distributed except according to those terms.
 
-
 extern crate byteorder;
 
 
 use std::io::Cursor;
 use std::io::Read;
-use byteorder::{LittleEndian, ReadBytesExt, ByteOrder};
-
+use byteorder::{LittleEndian, ByteOrder};
 
 pub fn murmur3_32<T :Read>(source: &mut T, seed: u32) -> u32 {
     const C1: u32 = 0x85ebca6b;
@@ -30,8 +28,7 @@ pub fn murmur3_32<T :Read>(source: &mut T, seed: u32) -> u32 {
             Ok(size) => {
                 match size {
                     4 => {
-                        let mut tmp = Cursor::new(buf);
-                        let k = tmp.read_u32::<LittleEndian>().unwrap();
+                        let k = LittleEndian::read_u32(&buf);
                         hash ^= calc_k(k);
                         hash = hash.rotate_left(R2);
                         hash = (hash.wrapping_mul(M)).wrapping_add(N);
