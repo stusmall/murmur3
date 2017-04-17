@@ -22,7 +22,7 @@ struct Result {
 
 #[test]
 fn test_static_strings() {
-    let tests: [Result; 25] = [Result {
+    let tests = [Result {
                                    string: "Lorem ipsum dolor sit amet, consectetur adipisicing \
                                             elit",
                                    hash_32: 0x3bf7e870,
