@@ -58,3 +58,41 @@ fn hasher_test_1_32bit(){
     }
     assert_eq!(hash32, h.finish());
 }
+
+
+#[test]
+fn test_32_hasher_2(){
+    let hash32  = 0x13a51193;
+    let bytes = b"12345";
+
+    let mut h = MurmurHasher::default();
+    for x in bytes.chunks(1){
+        h.write(x);
+    }
+    assert_eq!(hash32, h.finish());
+
+    let mut h = MurmurHasher::default();
+    for x in bytes.chunks(2){
+        h.write(x);
+    }
+    assert_eq!(hash32, h.finish());
+
+    let mut h = MurmurHasher::default();
+    for x in bytes.chunks(3){
+        h.write(x);
+    }
+    assert_eq!(hash32, h.finish());
+
+    let mut h = MurmurHasher::default();
+    for x in bytes.chunks(4){
+        h.write(x);
+    }
+    assert_eq!(hash32, h.finish());
+
+    let mut h = MurmurHasher::default();
+    for x in bytes.chunks(5){
+        h.write(x);
+    }
+    assert_eq!(hash32, h.finish());
+
+}
