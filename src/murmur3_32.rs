@@ -30,8 +30,7 @@ impl Hasher for MurmurHasher{
                 for i in 0 .. (4 - self.index) {
                     self.buf[self.index + i] = t.0[i];
                 }
-                let x = self.buf.clone();//TODO: we can remove this clone
-                self.state = process_4_bytes(self.state, &x);
+                self.state = process_4_bytes(self.state, &self.buf);
                 self.index = 0;
                 t.1
             }else{
@@ -113,13 +112,6 @@ fn process_odd_bytes(state: u32, index: usize, buf:&[u8]) -> u32{
     }
 }
 
-fn calc_k(k: u32) -> u32 {
-    const C1: u32 = 0xcc9e2d51;
-    const C2: u32 = 0x1b873593;
-    const R1: u32 = 15;
-    k.wrapping_mul(C1).rotate_left(R1).wrapping_mul(C2)
-}
-
 fn finish(state: u32, processed: u32) -> u32 {
     let mut hash = state;
     hash ^= processed as u32;
@@ -129,4 +121,11 @@ fn finish(state: u32, processed: u32) -> u32 {
     hash = hash.wrapping_mul(C2);
     hash ^= hash.wrapping_shr(R1);
     hash
+}
+
+fn calc_k(k: u32) -> u32 {
+    const C1: u32 = 0xcc9e2d51;
+    const C2: u32 = 0x1b873593;
+    const R1: u32 = 15;
+    k.wrapping_mul(C1).rotate_left(R1).wrapping_mul(C2)
 }
