@@ -216,6 +216,14 @@ fn test_static_strings() {
                                                   0xD3, 0x3D, 0xF5, 0xA5, 0x02, 0x37, 0xE6, 0xFE],
                                },
                                Result {
+                                   string: "1234567890123456789010",
+                                   hash_32: 0x1e4a77ff,
+                                   hash_128_x86: [0xFE, 0x78, 0x3B, 0x50, 0x3D, 0x5A, 0x45, 0x33,
+                                                  0xA7, 0xCB, 0x0F, 0x53, 0xB9, 0xF0, 0xAB, 0x36],
+                                   hash_128_x64: [0x76, 0x70, 0x7E, 0xAE, 0xC7, 0x8B, 0x20, 0x37,
+                                                  0xAF, 0xB8, 0xAB, 0x7A, 0x58, 0x79, 0xA9, 0xEF],
+                               },
+                               Result {
                                    string: "€",
                                    hash_32: 0x5b43fca5,
                                    hash_128_x86: [0x4C, 0xF5, 0x4D, 0xC, 0x9F, 0x57, 0x9A, 0xBA,
