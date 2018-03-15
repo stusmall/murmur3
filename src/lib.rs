@@ -116,7 +116,7 @@ pub fn murmur3_x86_128<T :Read>(source: &mut T, seed: u32, out: &mut [u8]) {
                         h1 ^= process_h1_k_x86(LittleEndian::read_u32(&buf[0..4]));
                         h2 ^= process_h2_k_x86(LittleEndian::read_u32(&buf[4..8]));
                         h3 ^= process_h3_k_x86(LittleEndian::read_u32(&buf[8..12]));
-                        h4 ^= process_h4_k_x86(LittleEndian::read_int(&buf[12..size], size -12) as u32);
+                        h4 ^= process_h4_k_x86(LittleEndian::read_uint(&buf[12..size], size -12) as u32);
                     }
                     12 => {
                         h1 ^= process_h1_k_x86(LittleEndian::read_u32(&buf[0..4]));
@@ -126,7 +126,7 @@ pub fn murmur3_x86_128<T :Read>(source: &mut T, seed: u32, out: &mut [u8]) {
                     9...11 => {
                         h1 ^= process_h1_k_x86(LittleEndian::read_u32(&buf[0..4]));
                         h2 ^= process_h2_k_x86(LittleEndian::read_u32(&buf[4..8]));
-                        h3 ^= process_h3_k_x86(LittleEndian::read_int(&buf[8..size], size -8) as u32);
+                        h3 ^= process_h3_k_x86(LittleEndian::read_uint(&buf[8..size], size -8) as u32);
                     }
                     8 => {
                         h1 ^= process_h1_k_x86(LittleEndian::read_u32(&buf[0..4]));
@@ -134,13 +134,13 @@ pub fn murmur3_x86_128<T :Read>(source: &mut T, seed: u32, out: &mut [u8]) {
                     }
                     5...7 => {
                         h1 ^= process_h1_k_x86(LittleEndian::read_u32(&buf[0..4]));
-                        h2 ^= process_h2_k_x86(LittleEndian::read_int(&buf[4..size], size-4) as u32);
+                        h2 ^= process_h2_k_x86(LittleEndian::read_uint(&buf[4..size], size-4) as u32);
                     }
                     4 => {
                         h1 ^= process_h1_k_x86(LittleEndian::read_u32(&buf));
                     }
                     1...3 => {
-                        h1 ^= process_h1_k_x86(LittleEndian::read_int(&buf, size) as u32);
+                        h1 ^= process_h1_k_x86(LittleEndian::read_uint(&buf, size) as u32);
                     }
                     0 => {
                         h1 ^= processed;
@@ -246,13 +246,13 @@ pub fn murmur3_x64_128<T:Read>(source: &mut T, seed: u32, out: &mut [u8]) {
                     }
                     9...15 => {
                         h1 ^= process_h1_k_x64(LittleEndian::read_u64(&buf[0..8]));
-                        h2 ^= process_h2_k_x64(LittleEndian::read_int(&buf[8..], size - 8) as u64);
+                        h2 ^= process_h2_k_x64(LittleEndian::read_uint(&buf[8..], size - 8));
                     }
                     8 => {
                         h1 ^= process_h1_k_x64(LittleEndian::read_u64(&buf));
                     }
                     1...7 => {
-                        h1 ^= process_h1_k_x64(LittleEndian::read_int(&buf, size) as u64);
+                        h1 ^= process_h1_k_x64(LittleEndian::read_uint(&buf, size));
                     }
                     0 => {
                         h1 ^= processed as u64;
