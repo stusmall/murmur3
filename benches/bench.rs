@@ -2,6 +2,7 @@
 #![feature(test)]
 
 extern crate test;
+extern crate murmur3_sys;
 use test::Bencher;
 use std::io::Cursor;
 use std::hash::Hasher;
@@ -20,6 +21,8 @@ fn bench_32(b: &mut Bencher) {
         murmur3::murmur3_32(&mut tmp, 0)
     });
 }
+
+
 
 #[bench]
 fn new_bench_32(b: &mut Bencher) {
@@ -78,3 +81,17 @@ fn bench_x64_128(b: &mut Bencher) {
 
 
 
+
+
+
+#[bench]
+fn bench_c_x64_128(b: &mut Bencher) {
+    let string: &[u8] = b"Lorem ipsum dolor sit amet, consectetur adipisicing elit";
+    b.bytes = string.len() as u64;
+    b.iter(|| {
+        unsafe{
+            let output: [u8; 16] = [0; 16];
+            murmur3_sys::MurmurHash3_x64_128(string.as_ptr() as _,string.len() as i32,0,output.as_ptr() as *mut _);
+        }
+    });
+}
