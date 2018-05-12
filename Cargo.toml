@@ -11,3 +11,6 @@ license = "MIT/Apache-2.0"
 [dependencies]
 byteorder = "1.2"
 
+[dev-dependencies]
+murmur3-sys = { path = "./murmur3-sys"}
+quickcheck = "0.6"
