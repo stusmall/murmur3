@@ -12,6 +12,7 @@ use std::io::Read;
 use byteorder::{LittleEndian, ByteOrder};
 
 pub mod murmur3_32;
+pub mod murmur3_x64_128;
 
 pub fn murmur3_32<T :Read>(source: &mut T, seed: u32) -> u32 {
     const C1: u32 = 0x85ebca6b;
