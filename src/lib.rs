@@ -13,7 +13,7 @@ use byteorder::{LittleEndian, ByteOrder};
 
 pub mod murmur3_32;
 pub mod murmur3_x64_128;
-
+/*
 pub fn murmur3_32<T :Read>(source: &mut T, seed: u32) -> u32 {
     const C1: u32 = 0x85ebca6b;
     const C2: u32 = 0xc2b2ae35;
@@ -70,7 +70,7 @@ fn calc_k(k: u32) -> u32 {
     const C2: u32 = 0x1b873593;
     const R1: u32 = 15;
     k.wrapping_mul(C1).rotate_left(R1).wrapping_mul(C2)
-}
+}*/
 
 pub fn murmur3_x86_128<T :Read>(source: &mut T, seed: u32, out: &mut [u8]) {
     const C1: u32 = 0x239b961b;
@@ -221,8 +221,8 @@ fn fmix32(k: u32) -> u32 {
 
 
 pub fn murmur3_x64_128<T:Read>(source: &mut T, seed: u32, out: &mut [u8]) {
-    const C1: u64 = 0x52dce729;
-    const C2: u64 = 0x38495ab5;
+    const C1: u64 = 0x52dc_e729;
+    const C2: u64 = 0x3849_5ab5;
     const R1: u32 = 27;
     const R2: u32 = 31;
     const M: u64 = 5;
@@ -280,8 +280,8 @@ pub fn murmur3_x64_128<T:Read>(source: &mut T, seed: u32, out: &mut [u8]) {
 }
 
 fn process_h1_k_x64(k: u64) -> u64 {
-    const C1: u64 = 0x87c37b91114253d5;
-    const C2: u64 = 0x4cf5ad432745937f;
+    const C1: u64 = 0x87c3_7b91_1142_53d5;
+    const C2: u64 = 0x4cf5_ad43_2745_937f;
     const R: u32 = 31;
     k.wrapping_mul(C1).rotate_left(R).wrapping_mul(C2)
 }

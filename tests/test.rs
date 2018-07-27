@@ -8,8 +8,16 @@
 
 
 extern crate murmur3;
+extern crate byteorder;
+
+
 
 use std::io::Cursor;
+use std::hash::Hasher;
+
+use byteorder::WriteBytesExt;
+
+use murmur3::murmur3_32::MurmurHasher as MurmurHasher32;
 
 
 struct Result {
@@ -243,11 +251,14 @@ fn test_static_strings() {
 
     for test in &tests {
         let mut out: [u8; 16] = [0; 16];
-        assert_eq!(murmur3::murmur3_32(&mut Cursor::new(test.string.as_bytes()), 0),
+        let mut hasher = MurmurHasher32::new(0);
+        hasher.write(test.string.as_bytes());
+        assert_eq!(hasher.build_murmur_hash(),
                    test.hash_32);
         murmur3::murmur3_x86_128(&mut Cursor::new(test.string.as_bytes()), 0, &mut out);
         assert!(out == test.hash_128_x86, "Failed on string {}", test.string);
-        murmur3::murmur3_x64_128(&mut Cursor::new(test.string.as_bytes()), 0, &mut out);
+        let x = murmur3::murmur3_x64_128::murmur3_x64_128(&mut Cursor::new(test.string.as_bytes()), 0).unwrap();
+        (&mut out).write_u128(x);
         assert!(out == test.hash_128_x64, "Failed on string {}", test.string);
     }
 }

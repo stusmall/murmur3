@@ -9,7 +9,7 @@ license = "MIT/Apache-2.0"
 
 
 [dependencies]
-byteorder = "1.2"
+byteorder = { version = "1.2", features=["i128"] }
 
 [dev-dependencies]
 murmur3-sys = { path = "./murmur3-sys"}

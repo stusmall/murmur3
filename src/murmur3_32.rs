@@ -1,4 +1,5 @@
-
+use std::io::Read;
+use std::error::Error;
 use std::hash::Hasher;
 use byteorder::{LittleEndian, ByteOrder};
 
@@ -10,6 +11,28 @@ const R2: u32 = 13;
 const M: u32 = 5;
 const N: u32 = 0xe6546b64;
 
+pub fn murmur3_32<T :Read>(source: &mut T, seed: u32) -> Result<u32, String> {
+    let mut buffer:[u8;4] = [0; 4];
+    let mut hasher = MurmurHasher::new(seed);
+    loop {
+        match source.read(&mut buffer) {
+            Ok(4) => {
+                hasher.write(&buffer);
+            }
+            Ok(0) => {
+                return Ok(hasher.build_murmur_hash());
+            }
+            Err(e) => {
+                return Err(String::from(e.description()))
+            }
+            Ok(i) => {
+                hasher.write(&buffer[..i]);
+                return Ok(hasher.build_murmur_hash());
+            }
+        }
+    }
+}
+
 
 pub struct MurmurHasher{
     state: u32,
@@ -19,6 +42,10 @@ pub struct MurmurHasher{
 }
 
 impl Hasher for MurmurHasher{
+    fn finish(&self) -> u64 {
+        self.build_murmur_hash() as u64
+    }
+
     fn write(&mut self, bytes: &[u8]){
         self.processed += bytes.len() as u32;
 
@@ -46,15 +73,6 @@ impl Hasher for MurmurHasher{
             }
         }
     }
-
-    fn finish(&self) -> u64 {
-        let state = if self.index != 0 {
-             process_odd_bytes(self.state, self.index, &self.buf)
-        }else{
-            self.state
-        };
-        finish(state, self.processed) as u64
-    }
 }
 
 
@@ -70,6 +88,22 @@ impl Default for MurmurHasher {
 }
 
 impl MurmurHasher {
+    pub fn new(seed:u32) -> Self{
+        MurmurHasher{
+            state: seed,
+            ..MurmurHasher::default()
+        }
+    }
+
+    pub fn build_murmur_hash(&self) -> u32{
+        let state = if self.index != 0 {
+            process_odd_bytes(self.state, self.index, &self.buf)
+        }else{
+            self.state
+        };
+        finish(state, self.processed)
+    }
+
     fn push_odd_bytes(&mut self, to_push: &[u8]){
         for x in to_push {
             self.buf[self.index] = *x;
