@@ -14,3 +14,9 @@ byteorder = { version = "1.2", features=["i128"] }
 [dev-dependencies]
 murmur3-sys = { path = "./murmur3-sys"}
 quickcheck = "0.6"
+
+
+
+[profile.bench]
+lto = true
+codegen-units = 1

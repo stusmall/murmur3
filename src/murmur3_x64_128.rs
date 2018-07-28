@@ -8,7 +8,7 @@ pub struct MurmurHasher{
     h2: u64,
     buf: [u8; 16],
     index: usize,
-    processed: u32
+    processed: usize
 }
 
 impl Default for MurmurHasher {
@@ -25,11 +25,11 @@ impl Default for MurmurHasher {
 }
 
 pub fn murmur3_x64_128<T :Read>(source: &mut T, seed: u32) -> Result<u128, String> {
-    let mut buffer:[u8;4] = [0; 4];
+    let mut buffer:[u8;16] = [0; 16];
     let mut hasher = MurmurHasher::new(seed);
     loop {
         match source.read(&mut buffer) {
-            Ok(4) => {
+            Ok(16) => {
                 hasher.write(&buffer);
             }
             Ok(0) => {
@@ -48,21 +48,11 @@ pub fn murmur3_x64_128<T :Read>(source: &mut T, seed: u32) -> Result<u128, Strin
 
 impl Hasher for MurmurHasher{
     fn finish(&self) -> u64 {
-        /*let state =if self.index != 0 {
-            process_odd_bytes(self.h1, self.h2, self.index, &self.buf)
-        }else{
-            (self.h1, self.h2)
-        };
-
-        let x = finish(state.0, state.1, self.processed);
-        //This hasher wants a 64 bit return even if we have 128 bits.
-        //I'm just going to XOR the two 64 bit chunks together to get
-        //what they want.
-        x as u64*/
         self.build_murmur_hash() as u64
     }
 
     fn write(&mut self, bytes: &[u8]){
+        self.processed += bytes.len();
         let to_split = if self.index == 0 {
             bytes
         }else{ 
@@ -107,9 +97,7 @@ impl MurmurHasher {
         }else{
             (self.h1, self.h2)
         };
-        let x = finish(state.0, state.1, self.processed);
-        println!("In final build {:?}", x);
-        x
+        finish(state.0, state.1, self.processed)
     }
 
 
@@ -144,13 +132,13 @@ fn process_odd_bytes(h1: u64, h2:u64, index: usize, buf:&[u8]) -> (u64,u64){
     match index {
         9...15 => {
             (h1 ^ process_h1_k_x64(LittleEndian::read_u64(&buf[0..8])),
-            h2 ^ process_h2_k_x64(LittleEndian::read_uint(&buf[8..], index - 1 - 8) as u64))
+            h2 ^ process_h2_k_x64(LittleEndian::read_uint(&buf[8..], index  - 8) as u64))
         }
         8 => {
             (h1 ^ process_h1_k_x64(LittleEndian::read_u64(&buf)), h2)
         }
         1...7 =>{
-            (h1 ^ process_h1_k_x64(LittleEndian::read_uint(&buf, index - 1) as u64), h2)
+            (h1 ^ process_h1_k_x64(LittleEndian::read_uint(&buf, index ) as u64), h2)
         }
         _ => {
             panic!("Invalid index on process_odd_bytes");
@@ -159,7 +147,7 @@ fn process_odd_bytes(h1: u64, h2:u64, index: usize, buf:&[u8]) -> (u64,u64){
 }
 
 #[inline(always)]
-fn finish(h1: u64, h2:u64, processed: u32) -> u128 {
+fn finish(h1: u64, h2:u64, processed: usize) -> u128 {
     let mut h1 = h1 ^ (processed as u64);
     let mut h2 = h2 ^ (processed as u64);
     h1 = h1.wrapping_add(h2);
@@ -168,8 +156,7 @@ fn finish(h1: u64, h2:u64, processed: u32) -> u128 {
     h2 = fmix64(h2);
     h1 = h1.wrapping_add(h2);
     h2 = h2.wrapping_add(h1);
-    ((h1 as u128) << 64) + (h2 as u128)
-    //(h1,h2)
+    ((h2 as u128) << 64) + (h1 as u128)
 }
 
 
