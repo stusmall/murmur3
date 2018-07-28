@@ -54,7 +54,6 @@ quickcheck! {
 
 quickcheck! {
     fn quickcheck_x64_128(input:(u32, Vec<u8>)) -> bool {
-        println!("Launching check with {:?}", input);
         let seed = input.0;
         let xs = input.1;
         let output_bytes: [u8; 16] = [0; 16];
@@ -63,7 +62,6 @@ quickcheck! {
         };
         let output = LittleEndian::read_u128(&output_bytes);
         let output2 = murmur3_x64_128(&mut Cursor::new(xs), seed).unwrap();
-        println!("Compare {} {}", output, output2);
         output == output2
     }
 }

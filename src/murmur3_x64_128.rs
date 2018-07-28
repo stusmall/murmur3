@@ -146,7 +146,6 @@ fn process_odd_bytes(h1: u64, h2:u64, index: usize, buf:&[u8]) -> (u64,u64){
     }
 }
 
-#[inline(always)]
 fn finish(h1: u64, h2:u64, processed: usize) -> u128 {
     let mut h1 = h1 ^ (processed as u64);
     let mut h2 = h2 ^ (processed as u64);
@@ -160,7 +159,6 @@ fn finish(h1: u64, h2:u64, processed: usize) -> u128 {
 }
 
 
-
 fn process_h1_k_x64(k: u64) -> u64 {
     const C1: u64 = 0x87c37b91114253d5;
     const C2: u64 = 0x4cf5ad432745937f;
@@ -168,14 +166,12 @@ fn process_h1_k_x64(k: u64) -> u64 {
     k.wrapping_mul(C1).rotate_left(R).wrapping_mul(C2)
 }
 
-
 fn process_h2_k_x64(k: u64) -> u64 {
     const C1: u64 = 0x87c37b91114253d5;
     const C2: u64 = 0x4cf5ad432745937f;
     const R: u32 = 33;
     k.wrapping_mul(C2).rotate_left(R).wrapping_mul(C1)
 }
-
 
 fn fmix64(k: u64) -> u64 {
     const C1: u64 = 0xff51_afd7_ed55_8ccd;

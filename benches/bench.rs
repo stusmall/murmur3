@@ -19,7 +19,7 @@ use murmur3_sys::MurmurHash3_x86_32;
 
 #[bench]
 fn new_bench_x64_128(b: &mut Bencher) {
-    let string: &[u8] = b"Lorem ipsum dolor sit amet, consectetur adipisicing elit";
+    let string: &[u8] = test::black_box(b"Lorem ipsum dolor sit amet, consectetur adipisicing elit");
     b.bytes = string.len() as u64;
     b.iter(|| {
         let mut h = murmur3_x64_128::MurmurHasher::default();
@@ -30,7 +30,7 @@ fn new_bench_x64_128(b: &mut Bencher) {
 
 #[bench]
 fn bench_32(b: &mut Bencher) {
-    let string: &[u8] = b"Lorem ipsum dolor sit amet, consectetur adipisicing elit";
+    let string: &[u8] = test::black_box(b"Lorem ipsum dolor sit amet, consectetur adipisicing elit");
     b.bytes = string.len() as u64;
     b.iter(|| {
         let mut h = murmur3_32::MurmurHasher::default();
@@ -41,7 +41,7 @@ fn bench_32(b: &mut Bencher) {
 
 #[bench]
 fn bench_c_32(b: &mut Bencher) {
-    let string: &[u8] = b"Lorem ipsum dolor sit amet, consectetur adipisicing elit";
+    let string: &[u8] = test::black_box(b"Lorem ipsum dolor sit amet, consectetur adipisicing elit");
     b.bytes = string.len() as u64;
     b.iter(|| {
         unsafe {
@@ -53,7 +53,7 @@ fn bench_c_32(b: &mut Bencher) {
 
 #[bench]
 fn bench_x86_128(b: &mut Bencher) {
-    let string: &[u8] = b"Lorem ipsum dolor sit amet, consectetur adipisicing elit";
+    let string: &[u8] = test::black_box(b"Lorem ipsum dolor sit amet, consectetur adipisicing elit");
     b.bytes = string.len() as u64;
     b.iter(|| {
         let mut out: [u8; 16] = [0; 16];
@@ -64,7 +64,7 @@ fn bench_x86_128(b: &mut Bencher) {
 
 #[bench]
 fn bench_x64_128(b: &mut Bencher) {
-    let string: &[u8] = b"Lorem ipsum dolor sit amet, consectetur adipisicing elit";
+    let string: &[u8] = test::black_box(b"Lorem ipsum dolor sit amet, consectetur adipisicing elit");
     b.bytes = string.len() as u64;
     b.iter(|| {
         let mut out: [u8; 16] = [0; 16];
@@ -80,7 +80,7 @@ fn bench_x64_128(b: &mut Bencher) {
 
 #[bench]
 fn bench_c_x64_128(b: &mut Bencher) {
-    let string: &[u8] = b"Lorem ipsum dolor sit amet, consectetur adipisicing elit";
+    let string: &[u8] = test::black_box(b"Lorem ipsum dolor sit amet, consectetur adipisicing elit");
     b.bytes = string.len() as u64;
     b.iter(|| {
         unsafe{
