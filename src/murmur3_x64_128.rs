@@ -102,10 +102,9 @@ impl MurmurHasher {
 
 
     fn push_odd_bytes(&mut self, to_push: &[u8]){
-        for x in to_push {
-            self.buf[self.index] = *x;
-            self.index += 1;
-        }
+        let l = to_push.len();
+        self.buf[self.index..(self.index + l)].clone_from_slice(&to_push);
+        self.index += l;
     }
 }
 
@@ -155,7 +154,7 @@ fn finish(h1: u64, h2:u64, processed: usize) -> u128 {
     h2 = fmix64(h2);
     h1 = h1.wrapping_add(h2);
     h2 = h2.wrapping_add(h1);
-    ((h2 as u128) << 64) + (h1 as u128)
+    ((h2 as u128) << 64) | (h1 as u128)
 }
 
 
