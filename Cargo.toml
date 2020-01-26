@@ -1,11 +1,12 @@
 [package]
 name = "murmur3"
-version = "0.4.1"
+version = "0.5.0"
 authors = [ "Stu Small <stuart.alan.small@gmail.com>" ]
 description = "A rust implementation of Murmur3 hash"
 repository = "https://github.com/stusmall/murmur3"
 keywords = ["hash","murmur3","murmur"]
 license = "MIT/Apache-2.0"
+edition = "2018"
 
 
 [dependencies]
@@ -13,9 +14,7 @@ byteorder = { version = "1.2", features=["i128"] }
 
 [dev-dependencies]
 murmur3-sys = { path = "./murmur3-sys"}
-quickcheck = "0.6"
-
-
+quickcheck = "0.9"
 
 [profile.bench]
 lto = true

@@ -7,4 +7,4 @@ authors = ["Stu Small <stuart.small@threat-x.com>"]
 
 
 [build-dependencies]
-bindgen = "0.37.4"
+bindgen = "0.52"

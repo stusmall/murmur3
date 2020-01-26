@@ -1,175 +1,122 @@
-use std::hash::Hasher;
-use byteorder::{LittleEndian, ByteOrder};
-use std::io::Read;
-use std::error::Error;
+// Copyright (c) 2020 Stu Small
+//
+// Licensed under the Apache License, Version 2.0
+// <LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0> or the MIT
+// license <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-pub struct MurmurHasher{
-    h1: u64,
-    h2: u64,
-    buf: [u8; 16],
-    index: usize,
-    processed: usize
-}
+use std::io::{Read, Result};
+use std::ops::Shl;
 
-impl Default for MurmurHasher {
+use byteorder::{ByteOrder, LittleEndian};
 
-    fn default() -> Self{
-        MurmurHasher{
-            h1: 0,
-            h2: 0,
-            buf: [0; 16],
-            index: 0,
-            processed: 0
-        }
-    }
-}
-
-pub fn murmur3_x64_128<T :Read>(source: &mut T, seed: u32) -> Result<u128, String> {
-    let mut buffer:[u8;16] = [0; 16];
-    let mut hasher = MurmurHasher::new(seed);
-    loop {
-        match source.read(&mut buffer) {
-            Ok(16) => {
-                hasher.write(&buffer);
-            }
-            Ok(0) => {
-                return Ok(hasher.build_murmur_hash());
-            }
-            Err(e) => {
-                return Err(String::from(e.description()))
-            }
-            Ok(i) => {
-                hasher.write(&buffer[..i]);
-                return Ok(hasher.build_murmur_hash());
-            }
-        }
-    }
-}
-
-impl Hasher for MurmurHasher{
-    fn finish(&self) -> u64 {
-        self.build_murmur_hash() as u64
-    }
-
-    fn write(&mut self, bytes: &[u8]){
-        self.processed += bytes.len();
-        let to_split = if self.index == 0 {
-            bytes
-        }else{ 
-            if bytes.len() + self.index >= 16 {
-                let t = bytes.split_at(16 - self.index);
-                for i in 0 .. (16 - self.index) {
-                    self.buf[self.index + i] = t.0[i];
-                }
-                let r = process_16_bytes(self.h1, self.h2, &self.buf);
-                self.h1 = r.0;
-                self.h2 = r.1;
-                self.index = 0;
-                t.1
-            }else{
-                bytes
-            }
-        };
-        for chunk in to_split.chunks(16) {
-            if chunk.len() == 16{
-                let t = process_16_bytes(self.h1, self.h2, chunk);
-                self.h1 = t.0;
-                self.h2 = t.1;
-            }else{
-                self.push_odd_bytes(chunk);
-            }
-        }
-    }
-}
-
-impl MurmurHasher {
-    pub fn new(seed:u32) -> Self{
-        MurmurHasher{
-            h1: seed as u64,
-            h2: seed as u64,
-            ..MurmurHasher::default()
-        }
-    }
-
-    pub fn build_murmur_hash(&self) -> u128{
-        let state = if self.index != 0 {
-            process_odd_bytes(self.h1, self.h2, self.index, &self.buf)
-        }else{
-            (self.h1, self.h2)
-        };
-        finish(state.0, state.1, self.processed)
-    }
-
-
-    fn push_odd_bytes(&mut self, to_push: &[u8]){
-        let l = to_push.len();
-        self.buf[self.index..(self.index + l)].clone_from_slice(&to_push);
-        self.index += l;
-    }
-}
-
-
-fn process_16_bytes(h1: u64, h2: u64, chunk:&[u8]) -> (u64,u64){
-    const C1: u64 = 0x52dc_e729;
-    const C2: u64 = 0x3849_5ab5;
+/// Use the x64 variant of the 128 bit murmur3 to hash some [Read] implementation.
+///
+/// # Example
+/// ```
+/// use std::io::Cursor;
+/// use murmur3::murmur3_x64_128;
+/// let hash_result = murmur3_x64_128(&mut Cursor::new("hello world"), 0);
+/// ```
+pub fn murmur3_x64_128<T: Read>(source: &mut T, seed: u32) -> Result<u128> {
+    const C1: u64 = 0x87c3_7b91_1142_53d5;
+    const C2: u64 = 0x4cf5_ad43_2745_937f;
+    const C3: u64 = 0x52dc_e729;
+    const C4: u64 = 0x3849_5ab5;
     const R1: u32 = 27;
     const R2: u32 = 31;
+    const R3: u32 = 33;
     const M: u64 = 5;
-    let mut h1 = h1;
-    let mut h2 = h2;
-    let k1 = LittleEndian::read_u64(&chunk[0..8]);
-    let k2 = LittleEndian::read_u64(&chunk[8..]);
-    h1 ^= process_h1_k_x64(k1);
-    h1 = h1.rotate_left(R1).wrapping_add(h2).wrapping_mul(M).wrapping_add(C1);
-    h2 ^= process_h2_k_x64(k2);
-    h2 = h2.rotate_left(R2).wrapping_add(h1).wrapping_mul(M).wrapping_add(C2);
-    (h1,h2)
-}
-
-
-fn process_odd_bytes(h1: u64, h2:u64, index: usize, buf:&[u8]) -> (u64,u64){
-    match index {
-        9...15 => {
-            (h1 ^ process_h1_k_x64(LittleEndian::read_u64(&buf[0..8])),
-            h2 ^ process_h2_k_x64(LittleEndian::read_uint(&buf[8..], index  - 8) as u64))
-        }
-        8 => {
-            (h1 ^ process_h1_k_x64(LittleEndian::read_u64(&buf)), h2)
-        }
-        1...7 =>{
-            (h1 ^ process_h1_k_x64(LittleEndian::read_uint(&buf, index ) as u64), h2)
-        }
-        _ => {
-            panic!("Invalid index on process_odd_bytes");
+    let mut h1: u64 = seed as u64;
+    let mut h2: u64 = seed as u64;
+    let mut buf = [0; 16];
+    let mut processed: usize = 0;
+    loop {
+        let read = source.read(&mut buf[..])?;
+        processed += read;
+        if read == 16 {
+            let k1 = LittleEndian::read_u64(&buf[0..8]);
+            let k2 = LittleEndian::read_u64(&buf[8..]);
+            h1 ^= k1.wrapping_mul(C1).rotate_left(R2).wrapping_mul(C2);
+            h1 = h1
+                .rotate_left(R1)
+                .wrapping_add(h2)
+                .wrapping_mul(M)
+                .wrapping_add(C3);
+            h2 ^= k2.wrapping_mul(C2).rotate_left(R3).wrapping_mul(C1);
+            h2 = h2
+                .rotate_left(R2)
+                .wrapping_add(h1)
+                .wrapping_mul(M)
+                .wrapping_add(C4);
+        } else if read == 0 {
+            h1 ^= processed as u64;
+            h2 ^= processed as u64;
+            h1 = h1.wrapping_add(h2);
+            h2 = h2.wrapping_add(h1);
+            h1 = fmix64(h1);
+            h2 = fmix64(h2);
+            h1 = h1.wrapping_add(h2);
+            h2 = h2.wrapping_add(h1);
+            let x = ((h2 as u128) << 64) | (h1 as u128);
+            return Ok(x);
+        } else {
+            let mut k1 = 0;
+            let mut k2 = 0;
+            if read >= 15 {
+                k2 ^= (buf[14] as u64).shl(48);
+            }
+            if read >= 14 {
+                k2 ^= (buf[13] as u64).shl(40);
+            }
+            if read >= 13 {
+                k2 ^= (buf[12] as u64).shl(32);
+            }
+            if read >= 12 {
+                k2 ^= (buf[11] as u64).shl(24);
+            }
+            if read >= 11 {
+                k2 ^= (buf[10] as u64).shl(16);
+            }
+            if read >= 10 {
+                k2 ^= (buf[9] as u64).shl(8);
+            }
+            if read >= 9 {
+                k2 ^= buf[8] as u64;
+                k2 = k2.wrapping_mul(C2).rotate_left(33).wrapping_mul(C1);
+                h2 ^= k2;
+            }
+            if read >= 8 {
+                k1 ^= (buf[7] as u64).shl(56);
+            }
+            if read >= 7 {
+                k1 ^= (buf[6] as u64).shl(48);
+            }
+            if read >= 6 {
+                k1 ^= (buf[5] as u64).shl(40);
+            }
+            if read >= 5 {
+                k1 ^= (buf[4] as u64).shl(32);
+            }
+            if read >= 4 {
+                k1 ^= (buf[3] as u64).shl(24);
+            }
+            if read >= 3 {
+                k1 ^= (buf[2] as u64).shl(16);
+            }
+            if read >= 2 {
+                k1 ^= (buf[1] as u64).shl(8);
+            }
+            if read >= 1 {
+                k1 ^= buf[0] as u64;
+            }
+            k1 = k1.wrapping_mul(C1);
+            k1 = k1.rotate_left(31);
+            k1 = k1.wrapping_mul(C2);
+            h1 ^= k1;
         }
     }
-}
-
-fn finish(h1: u64, h2:u64, processed: usize) -> u128 {
-    let mut h1 = h1 ^ (processed as u64);
-    let mut h2 = h2 ^ (processed as u64);
-    h1 = h1.wrapping_add(h2);
-    h2 = h2.wrapping_add(h1);
-    h1 = fmix64(h1);
-    h2 = fmix64(h2);
-    h1 = h1.wrapping_add(h2);
-    h2 = h2.wrapping_add(h1);
-    ((h2 as u128) << 64) | (h1 as u128)
-}
-
-
-fn process_h1_k_x64(k: u64) -> u64 {
-    const C1: u64 = 0x87c37b91114253d5;
-    const C2: u64 = 0x4cf5ad432745937f;
-    const R: u32 = 31;
-    k.wrapping_mul(C1).rotate_left(R).wrapping_mul(C2)
-}
-
-fn process_h2_k_x64(k: u64) -> u64 {
-    const C1: u64 = 0x87c37b91114253d5;
-    const C2: u64 = 0x4cf5ad432745937f;
-    const R: u32 = 33;
-    k.wrapping_mul(C2).rotate_left(R).wrapping_mul(C1)
 }
 
 fn fmix64(k: u64) -> u64 {
