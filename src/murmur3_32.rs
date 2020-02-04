@@ -6,7 +6,6 @@
 // option. All files in the project carrying such notice may not be copied,
 // modified, or distributed except according to those terms.
 
-use byteorder::{ByteOrder, LittleEndian};
 use std::io::{Read, Result};
 
 const C1: u32 = 0x85eb_ca6b;
@@ -32,7 +31,7 @@ pub fn murmur3_32<T: Read>(source: &mut T, seed: u32) -> Result<u32> {
         match source.read(&mut buffer)? {
             4 => {
                 processed += 4;
-                let k = LittleEndian::read_u32(&buffer);
+                let k = u32::from_le_bytes(buffer);
                 state ^= calc_k(k);
                 state = state.rotate_left(R2);
                 state = (state.wrapping_mul(M)).wrapping_add(N);
@@ -53,7 +52,7 @@ pub fn murmur3_32<T: Read>(source: &mut T, seed: u32) -> Result<u32> {
                 state ^= calc_k(k);
             }
             0 => return Ok(finish(state, processed)),
-            _ => panic!("Internal buffer state failure")
+            _ => panic!("Internal buffer state failure"),
         }
     }
 }

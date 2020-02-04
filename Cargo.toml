@@ -8,9 +8,7 @@ keywords = ["hash","murmur3","murmur"]
 license = "MIT/Apache-2.0"
 edition = "2018"
 
-
 [dependencies]
-byteorder = { version = "1.2", features=["i128"] }
 
 [dev-dependencies]
 murmur3-sys = { path = "./murmur3-sys"}

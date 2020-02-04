@@ -9,7 +9,7 @@
 use std::io::{Read, Result};
 use std::ops::Shl;
 
-use byteorder::{ByteOrder, LittleEndian};
+use crate::copy_into_array;
 
 /// Use the x64 variant of the 128 bit murmur3 to hash some [Read] implementation.
 ///
@@ -36,8 +36,8 @@ pub fn murmur3_x64_128<T: Read>(source: &mut T, seed: u32) -> Result<u128> {
         let read = source.read(&mut buf[..])?;
         processed += read;
         if read == 16 {
-            let k1 = LittleEndian::read_u64(&buf[0..8]);
-            let k2 = LittleEndian::read_u64(&buf[8..]);
+            let k1 = u64::from_le_bytes(copy_into_array(&buf[0..8]));
+            let k2 = u64::from_le_bytes(copy_into_array(&buf[8..]));
             h1 ^= k1.wrapping_mul(C1).rotate_left(R2).wrapping_mul(C2);
             h1 = h1
                 .rotate_left(R1)
