@@ -6,12 +6,9 @@
 // option. All files in the project carrying such notice may not be copied,
 // modified, or distributed except according to those terms.
 
-extern crate byteorder;
 extern crate murmur3;
 
 use std::io::Cursor;
-
-use byteorder::{ByteOrder, LittleEndian};
 
 struct Result {
     string: &'static str,
@@ -358,10 +355,10 @@ fn test_static_strings() {
             test.string
         );
         let hash = murmur3::murmur3_x86_128(&mut Cursor::new(test.string.as_bytes()), 0).unwrap();
-        let expected = LittleEndian::read_u128(&test.hash_128_x86);
+        let expected = u128::from_le_bytes(test.hash_128_x86);
         assert_eq!(hash, expected, "Failed x86_128 on string {}", test.string);
         let hash = murmur3::murmur3_x64_128(&mut Cursor::new(test.string.as_bytes()), 0).unwrap();
-        let expected = LittleEndian::read_u128(&test.hash_128_x64);
+        let expected = u128::from_le_bytes(test.hash_128_x64);
         assert_eq!(hash, expected, "Failed on string {}", test.string);
     }
 }

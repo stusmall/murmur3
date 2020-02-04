@@ -6,15 +6,12 @@
 // option. All files in the project carrying such notice may not be copied,
 // modified, or distributed except according to those terms.
 
-extern crate byteorder;
 #[macro_use]
 extern crate quickcheck;
 extern crate murmur3;
 extern crate murmur3_sys;
 
 use std::io::Cursor;
-
-use byteorder::{ByteOrder, LittleEndian};
 
 use murmur3::murmur3_32;
 use murmur3_sys::MurmurHash3_x86_32;
@@ -33,7 +30,7 @@ quickcheck! {
         unsafe {
             MurmurHash3_x86_32(xs.as_ptr() as _, xs.len() as i32,seed,output.as_ptr() as *mut _)
         };
-        let output = LittleEndian::read_u32(&output);
+        let output = u32::from_le_bytes(output);
         let output2 = murmur3_32(&mut Cursor::new(xs), seed).unwrap();
         output == output2
     }
@@ -47,7 +44,7 @@ quickcheck! {
         unsafe {
             MurmurHash3_x86_128(xs.as_ptr() as _, xs.len() as i32,seed,output_bytes.as_ptr() as *mut _)
         };
-        let output = LittleEndian::read_u128(&output_bytes);
+        let output = u128::from_le_bytes(output_bytes);
         let output2 = murmur3_x86_128(&mut Cursor::new(xs), seed).unwrap();
         output == output2
     }
@@ -61,7 +58,7 @@ quickcheck! {
         unsafe {
             MurmurHash3_x64_128(xs.as_ptr() as _, xs.len() as i32,seed, output_bytes.as_ptr() as *mut _)
         };
-        let output = LittleEndian::read_u128(&output_bytes);
+        let output = u128::from_le_bytes(output_bytes);
         let output2 = murmur3_x64_128(&mut Cursor::new(xs), seed).unwrap();
         output == output2
     }
