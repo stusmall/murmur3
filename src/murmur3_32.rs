@@ -38,7 +38,8 @@ pub fn murmur3_32<T: Read>(source: &mut T, seed: u32) -> Result<u32> {
             }
             3 => {
                 processed += 3;
-                let k: u32 = ((buffer[2] as u32) << 16) | ((buffer[1] as u32) << 8) | (buffer[0] as u32);
+                let k: u32 =
+                    ((buffer[2] as u32) << 16) | ((buffer[1] as u32) << 8) | (buffer[0] as u32);
                 state ^= calc_k(k);
             }
             2 => {

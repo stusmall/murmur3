@@ -5,6 +5,5 @@ authors = ["Stu Small <stuart.small@threat-x.com>"]
 
 [dependencies]
 
-
 [build-dependencies]
 bindgen = "0.53"
