@@ -4,17 +4,21 @@
 
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
-
 #[cfg(test)]
 mod tests {
 
     use super::*;
     #[test]
-    fn simple_test(){
-        unsafe{
+    fn simple_test() {
+        unsafe {
             let test = "hello".as_bytes();
             let output: [u8; 16] = [0; 16];
-            MurmurHash3_x64_128(test.as_ptr() as _,test.len() as i32,0,output.as_ptr() as *mut _);
+            MurmurHash3_x64_128(
+                test.as_ptr() as _,
+                test.len() as i32,
+                0,
+                output.as_ptr() as *mut _,
+            );
         }
     }
 }

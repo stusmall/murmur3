@@ -13,9 +13,9 @@ mod murmur3_32;
 mod murmur3_x64_128;
 mod murmur3_x86_128;
 
-pub use murmur3_32::*;
-pub use murmur3_x64_128::*;
-pub use murmur3_x86_128::*;
+pub use self::murmur3_32::*;
+pub use self::murmur3_x64_128::*;
+pub use self::murmur3_x86_128::*;
 
 fn copy_into_array<A, T>(slice: &[T]) -> A
 where
