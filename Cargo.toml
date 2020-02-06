@@ -8,8 +8,6 @@ keywords = ["hash","murmur3","murmur"]
 license = "MIT/Apache-2.0"
 edition = "2018"
 
-[dependencies]
-
 [dev-dependencies]
 murmur3-sys = { path = "./murmur3-sys"}
 quickcheck = "0.9"
