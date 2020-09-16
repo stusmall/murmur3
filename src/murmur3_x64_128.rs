@@ -9,7 +9,7 @@
 use std::io::{Read, Result};
 use std::ops::Shl;
 
-use crate::copy_into_array;
+use crate::{copy_into_array, read_bytes};
 
 /// Use the x64 variant of the 128 bit murmur3 to hash some [Read] implementation.
 ///
@@ -33,7 +33,7 @@ pub fn murmur3_x64_128<T: Read>(source: &mut T, seed: u32) -> Result<u128> {
     let mut buf = [0; 16];
     let mut processed: usize = 0;
     loop {
-        let read = source.read(&mut buf[..])?;
+        let read = read_bytes(source, &mut buf[..])?;
         processed += read;
         if read == 16 {
             let k1 = u64::from_le_bytes(copy_into_array(&buf[0..8]));
