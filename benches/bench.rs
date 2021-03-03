@@ -1,8 +1,8 @@
 #![feature(test)]
 
+extern crate murmur3;
 extern crate murmur3_sys;
 extern crate test;
-extern crate murmur3;
 
 use murmur3::*;
 

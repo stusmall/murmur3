@@ -4,7 +4,7 @@ mod tests_no_std {
 
     #[test]
     fn test_cursor() {
-        let mut cursor = Cursor::new(vec!{ 1, 2, 3, 4, 5 });
+        let mut cursor = Cursor::new(vec![1, 2, 3, 4, 5]);
         let mut buf = [0; 2];
 
         assert_eq!(cursor.read(&mut buf).unwrap(), 2);

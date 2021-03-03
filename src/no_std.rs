@@ -5,7 +5,7 @@ use core::cmp::min;
 
 /// The error
 #[derive(Debug)]
-pub enum Error { }
+pub enum Error {}
 
 /// The result of reading
 pub type Result<T> = core::result::Result<T, Error>;
@@ -26,16 +26,12 @@ pub struct Cursor<T> {
 impl<T> Cursor<T> {
     /// Create a new cursor
     pub fn new(inner: T) -> Self {
-        Self {
-            inner,
-            pos: 0,
-        }
+        Self { inner, pos: 0 }
     }
 }
 
 impl Read for Cursor<&[u8]> {
     fn read<const N: usize>(&mut self, buffer: &mut [u8; N]) -> Result<usize> {
-
         // get number of items we can copy
         let n_items = min(self.inner.len() - self.pos, N);
 
