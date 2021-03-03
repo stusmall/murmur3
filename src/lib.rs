@@ -10,7 +10,7 @@
 #![deny(missing_docs)]
 #![cfg_attr(not(feature = "std"), no_std)]
 
-#[cfg(not(feature = "std"))]
+#[cfg(feature = "alloc")]
 extern crate alloc;
 
 #[cfg(not(feature = "std"))]

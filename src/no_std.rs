@@ -1,5 +1,6 @@
 //! This file replaces some of std::io in a no_std environment
 
+#[cfg(feature = "alloc")]
 use alloc::vec::Vec;
 use core::cmp::min;
 
@@ -43,6 +44,7 @@ impl Read for Cursor<&[u8]> {
     }
 }
 
+#[cfg(feature = "alloc")]
 impl Read for Cursor<Vec<u8>> {
     fn read<const N: usize>(&mut self, buffer: &mut [u8; N]) -> Result<usize> {
         // get number of items we can copy
