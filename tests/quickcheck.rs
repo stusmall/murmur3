@@ -33,8 +33,6 @@ quickcheck! {
         let output = u32::from_le_bytes(output);
         let output2 = murmur3_32(&mut Cursor::new(xs), seed).unwrap();
 
-        println!("{:?} {:?}", output, output2);
-
         output == output2
     }
 }
