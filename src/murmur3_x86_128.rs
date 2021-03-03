@@ -35,7 +35,7 @@ pub fn murmur3_x86_128<T: Read>(source: &mut T, seed: u32) -> Result<u128> {
     let mut h3: u32 = seed;
     let mut h4: u32 = seed;
 
-    let mut buf: [u8; 16] = [0; 16];
+    let mut buf = [0; 16];
     let mut processed: usize = 0;
     loop {
         let read = source.read(&mut buf)?;
