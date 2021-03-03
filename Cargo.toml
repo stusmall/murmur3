@@ -8,6 +8,9 @@ keywords = ["hash","murmur3","murmur"]
 license = "MIT/Apache-2.0"
 edition = "2018"
 
+[features]
+no_std = []
+
 [dependencies]
 
 [dev-dependencies]

@@ -9,6 +9,19 @@
 //! A pure rust implementation of the fast, non-cryptographic hash [murmur3](https://en.wikipedia.org/wiki/MurmurHash)
 #![deny(missing_docs)]
 
+#![cfg_attr(feature = "no_std", no_std)]
+
+#[cfg(feature = "no_std")]
+extern crate alloc;
+
+#[cfg(feature = "no_std")]
+mod no_std;
+#[cfg(feature = "no_std")]
+pub use no_std::{Read, Result, Cursor};
+
+#[cfg(not(feature = "no_std"))]
+pub use std::io::{Read, Result, Cursor};
+
 mod murmur3_32;
 mod murmur3_x64_128;
 mod murmur3_x86_128;

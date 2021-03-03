@@ -2,13 +2,11 @@
 
 extern crate murmur3_sys;
 extern crate test;
-
-use std::io::Cursor;
-use test::Bencher;
-
 extern crate murmur3;
 
 use murmur3::*;
+
+use test::Bencher;
 
 use murmur3_sys::MurmurHash3_x86_32;
 

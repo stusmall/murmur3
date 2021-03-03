@@ -11,7 +11,7 @@ extern crate quickcheck;
 extern crate murmur3;
 extern crate murmur3_sys;
 
-use std::io::Cursor;
+use murmur3::Cursor;
 
 use murmur3::murmur3_32;
 use murmur3_sys::MurmurHash3_x86_32;
@@ -23,7 +23,7 @@ use murmur3::murmur3_x64_128;
 use murmur3_sys::MurmurHash3_x64_128;
 
 quickcheck! {
-    fn quickcheck_32(input:(u32, Vec<u8>)) -> bool{
+    fn quickcheck_32(input:(u32, Vec<u8>)) -> bool {
         let seed = input.0;
         let xs = input.1;
         let output: [u8; 4] = [0; 4];
@@ -32,6 +32,9 @@ quickcheck! {
         };
         let output = u32::from_le_bytes(output);
         let output2 = murmur3_32(&mut Cursor::new(xs), seed).unwrap();
+
+        println!("{:?} {:?}", output, output2);
+
         output == output2
     }
 }

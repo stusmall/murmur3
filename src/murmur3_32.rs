@@ -6,7 +6,7 @@
 // option. All files in the project carrying such notice may not be copied,
 // modified, or distributed except according to those terms.
 
-use std::io::{Read, Result};
+use crate::{Read, Result};
 
 const C1: u32 = 0x85eb_ca6b;
 const C2: u32 = 0xc2b2_ae35;
@@ -19,8 +19,7 @@ const N: u32 = 0xe654_6b64;
 ///
 /// # Example
 /// ```
-/// use std::io::Cursor;
-/// use murmur3::murmur3_32;
+/// use murmur3::{Cursor, murmur3_32};
 /// let hash_result = murmur3_32(&mut Cursor::new("hello world"), 0);
 /// ```
 pub fn murmur3_32<T: Read>(source: &mut T, seed: u32) -> Result<u32> {
