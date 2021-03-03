@@ -8,7 +8,7 @@
 
 extern crate murmur3;
 
-use std::io::Cursor;
+use murmur3::Cursor;
 
 struct Result {
     string: &'static str,

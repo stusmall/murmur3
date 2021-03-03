@@ -6,8 +6,9 @@
 // option. All files in the project carrying such notice may not be copied,
 // modified, or distributed except according to those terms.
 
-use std::io::{Read, Result};
-use std::ops::Shl;
+use crate::{Read, Result};
+
+use core::ops::Shl;
 
 use crate::copy_into_array;
 
@@ -15,8 +16,7 @@ use crate::copy_into_array;
 ///
 /// # Example
 /// ```
-/// use std::io::Cursor;
-/// use murmur3::murmur3_x86_128;
+/// use murmur3::{Cursor, murmur3_x86_128};
 /// let hash_result = murmur3_x86_128(&mut Cursor::new("hello world"), 0);
 /// ```
 pub fn murmur3_x86_128<T: Read>(source: &mut T, seed: u32) -> Result<u128> {
@@ -38,7 +38,7 @@ pub fn murmur3_x86_128<T: Read>(source: &mut T, seed: u32) -> Result<u128> {
     let mut buf = [0; 16];
     let mut processed: usize = 0;
     loop {
-        let read = source.read(&mut buf[..])?;
+        let read = source.read(&mut buf)?;
         processed += read;
         if read == 16 {
             let k1 = u32::from_le_bytes(copy_into_array(&buf[0..4]));
