@@ -3,21 +3,17 @@
 use alloc::vec::Vec;
 use core::cmp::min;
 
-/// The error
-#[derive(Debug)]
-pub enum Error {}
+/// The Result of a read operation.
+pub type Result<T> = core::result::Result<T, ()>;
 
-/// The result of reading
-pub type Result<T> = core::result::Result<T, Error>;
-
-/// A generic reading trait
+/// Allow to Read into a buffer
 pub trait Read {
     /// Read into a buffer.
-    /// @return the number of bytes read into the buffer
+    /// Returns the number of bytes that could be written.
     fn read<const N: usize>(&mut self, buffer: &mut [u8; N]) -> Result<usize>;
 }
 
-/// A Cursor
+/// A simple struct for turning common lists into a Read-able
 pub struct Cursor<T> {
     inner: T,
     pos: usize,
