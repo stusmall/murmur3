@@ -8,6 +8,8 @@
 
 use std::io::{Read, Result};
 
+use crate::read_bytes;
+
 const C1: u32 = 0x85eb_ca6b;
 const C2: u32 = 0xc2b2_ae35;
 const R1: u32 = 16;
@@ -28,7 +30,7 @@ pub fn murmur3_32<T: Read>(source: &mut T, seed: u32) -> Result<u32> {
     let mut processed = 0;
     let mut state = seed;
     loop {
-        match source.read(&mut buffer)? {
+        match read_bytes(source, &mut buffer)? {
             4 => {
                 processed += 4;
                 let k = u32::from_le_bytes(buffer);

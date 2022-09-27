@@ -8,7 +8,7 @@
 
 extern crate murmur3;
 
-use std::io::Cursor;
+use std::io::{Cursor, Read};
 
 struct Result {
     string: &'static str,
@@ -347,18 +347,59 @@ fn test_static_strings() {
         },
     ];
 
+    fn str_as_cursor(string: &str) -> Cursor<&[u8]> {
+        Cursor::new(string.as_bytes())
+    }
+
+    fn str_as_chained_cursor(string: &'static str) -> impl Read {
+        let string = string.as_bytes();
+        let mut result: Box<dyn Read> = Box::new(Cursor::new("".as_bytes()));
+        for i in 0..string.len() {
+            result = Box::new(result.chain(Cursor::new(&string[i..i + 1])));
+        }
+        result
+    }
+
     for test in &tests {
         assert_eq!(
-            murmur3::murmur3_32(&mut Cursor::new(test.string.as_bytes()), 0).unwrap(),
+            murmur3::murmur3_32(&mut str_as_cursor(test.string), 0).unwrap(),
             test.hash_32,
             "Failed 32 on string {}",
             test.string
         );
-        let hash = murmur3::murmur3_x86_128(&mut Cursor::new(test.string.as_bytes()), 0).unwrap();
+
+        let mut string = String::new();
+        str_as_chained_cursor(test.string)
+            .read_to_string(&mut string)
+            .unwrap();
+        assert_eq!(
+            murmur3::murmur3_32(&mut str_as_chained_cursor(test.string), 0).unwrap(),
+            test.hash_32,
+            "Failed 32 chained reader on string {}, reader value {}",
+            test.string,
+            string
+        );
+
         let expected = u128::from_le_bytes(test.hash_128_x86);
+        let hash = murmur3::murmur3_x86_128(&mut str_as_cursor(test.string), 0).unwrap();
         assert_eq!(hash, expected, "Failed x86_128 on string {}", test.string);
-        let hash = murmur3::murmur3_x64_128(&mut Cursor::new(test.string.as_bytes()), 0).unwrap();
+        let chained_hash =
+            murmur3::murmur3_x86_128(&mut str_as_chained_cursor(test.string), 0).unwrap();
+        assert_eq!(
+            chained_hash, expected,
+            "Failed x86_128 chained reader on string {}",
+            test.string
+        );
+
         let expected = u128::from_le_bytes(test.hash_128_x64);
+        let hash = murmur3::murmur3_x64_128(&mut str_as_cursor(test.string), 0).unwrap();
         assert_eq!(hash, expected, "Failed on string {}", test.string);
+        let chained_hash =
+            murmur3::murmur3_x64_128(&mut str_as_chained_cursor(test.string), 0).unwrap();
+        assert_eq!(
+            chained_hash, expected,
+            "Failed x64_128 chained reader on string {}",
+            test.string
+        );
     }
 }
