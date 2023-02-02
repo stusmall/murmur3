@@ -7,6 +7,7 @@
 // modified, or distributed except according to those terms.
 
 use std::io::{Read, Result};
+use std::cmp::min;
 
 use crate::read_bytes;
 
@@ -58,6 +59,55 @@ pub fn murmur3_32<T: Read>(source: &mut T, seed: u32) -> Result<u32> {
             _ => panic!("Internal buffer state failure"),
         }
     }
+}
+
+/// Use the 32 bit variant of murmur3 to hash [u8] without copying the buffer.
+///
+/// # Example
+/// 
+/// ```
+/// use murmur3::murmur3_32::nocopy;
+/// let hash_result = murmur3_32_nocopy("hello world".as_bytes(), 0)
+/// ```
+pub fn murmur3_32_nocopy(source: &[u8], seed: u32) -> u32 {
+    let mut buffer = source;
+    let mut processed = 0;
+    let mut state = seed;
+    loop {
+        match min(buffer.len(), 4) {
+            0 => return finish(state, processed),
+            1 => {
+                processed += 1;
+                let k: u32 = buffer[0] as u32;
+                state ^= calc_k(k);
+                return finish(state, processed);
+            },
+            2 => {
+                processed += 2;
+                let k: u32 = ((buffer[1] as u32) << 8) | (buffer [0] as u32);
+                state ^=  calc_k(k);
+                return finish(state, processed);
+            },
+            3 => {
+                processed += 3;
+                let k: u32 =
+                    ((buffer[2] as u32) << 16) | ((buffer [1] as u32) << 8) | (buffer[0] as u32);
+                state ^= calc_k(k);
+                return finish(state, processed);
+            },
+            4 => {
+                processed += 4;
+                let k: u32 =
+                    ((buffer[3] as u32) << 24) | ((buffer[2] as u32) << 16) |
+                    ((buffer[1] as u32) << 8) | (buffer[0] as u32);
+                state ^= calc_k(k); 
+                state = state.rotate_left(R2);
+                state = (state.wrapping_mul(M)).wrapping_add(N);
+                buffer = &buffer[4..];
+            },
+            _ => unreachable!()
+        };
+    };
 }
 
 fn finish(state: u32, processed: u32) -> u32 {
