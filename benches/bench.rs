@@ -1,5 +1,4 @@
 #![feature(test)]
-
 extern crate murmur3_sys;
 extern crate test;
 
@@ -20,6 +19,17 @@ fn bench_32(b: &mut Bencher) {
     b.iter(|| {
         let mut tmp = Cursor::new(&string[0..string.len()]);
         murmur3_32(&mut tmp, 0)
+    });
+}
+
+#[bench]
+fn bench_32_slice(b: &mut Bencher) {
+    let string: &[u8] =
+        test::black_box(b"Lorem ipsum dolor sit amet, consectetur adipisicing elit");
+    b.bytes = string.len() as u64;
+    b.iter(|| {
+        let tmp = &string[0..string.len()];
+        murmur3_32_of_slice(tmp, 0);
     });
 }
 
