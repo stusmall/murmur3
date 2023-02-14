@@ -69,7 +69,7 @@ pub fn murmur3_32<T: Read>(source: &mut T, seed: u32) -> Result<u32> {
 /// use murmur3::murmur3_32::nocopy;
 /// let hash_result = murmur3_32_nocopy("hello world".as_bytes(), 0)
 /// ```
-pub fn murmur3_32_nocopy(source: &[u8], seed: u32) -> u32 {
+pub fn murmur3_32_of_slice(source: &[u8], seed: u32) -> u32 {
     let mut buffer = source;
     let mut processed = 0;
     let mut state = seed;
@@ -113,7 +113,7 @@ pub fn murmur3_32_nocopy(source: &[u8], seed: u32) -> u32 {
 
 fn finish(state: u32, processed: u32) -> u32 {
     let mut hash = state;
-    hash ^= processed as u32;
+    hash ^= processed;
     hash ^= hash.wrapping_shr(R1);
     hash = hash.wrapping_mul(C1);
     hash ^= hash.wrapping_shr(R2);
