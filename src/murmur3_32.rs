@@ -66,8 +66,8 @@ pub fn murmur3_32<T: Read>(source: &mut T, seed: u32) -> Result<u32> {
 /// # Example
 ///
 /// ```
-/// use murmur3::murmur3_32::nocopy;
-/// let hash_result = murmur3_32_nocopy("hello world".as_bytes(), 0)
+/// use murmur3::murmur3_32_of_slice;
+/// let hash_result = murmur3_32_of_slice("hello world".as_bytes(), 0);
 /// ```
 pub fn murmur3_32_of_slice(source: &[u8], seed: u32) -> u32 {
     let mut buffer = source;

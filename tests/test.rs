@@ -368,6 +368,13 @@ fn test_static_strings() {
             test.string
         );
 
+        assert_eq!(
+            murmur3::murmur3_32_of_slice(test.string.as_bytes(), 0),
+            test.hash_32,
+            "Failed 32_of_slice on string {}",
+            test.string,
+        );
+
         let mut string = String::new();
         str_as_chained_cursor(test.string)
             .read_to_string(&mut string)
