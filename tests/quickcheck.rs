@@ -13,7 +13,7 @@ extern crate murmur3_sys;
 
 use std::io::Cursor;
 
-use murmur3::murmur3_32;
+use murmur3::{murmur3_32, murmur3_32_of_slice};
 use murmur3_sys::MurmurHash3_x86_32;
 
 use murmur3::murmur3_x86_128;
@@ -32,6 +32,20 @@ quickcheck! {
         };
         let output = u32::from_le_bytes(output);
         let output2 = murmur3_32(&mut Cursor::new(xs), seed).unwrap();
+        output == output2
+    }
+}
+
+quickcheck! {
+    fn quickcheck_32_slice(input:(u32, Vec<u8>)) -> bool{
+        let seed = input.0;
+        let xs = input.1;
+        let mut output: [u8; 4] = [0; 4];
+        unsafe {
+            MurmurHash3_x86_32(xs.as_ptr() as _, xs.len() as i32, seed, output.as_mut_ptr() as _)
+        };
+        let output = u32::from_le_bytes(output);
+        let output2 = murmur3_32_of_slice(&xs[..], seed);
         output == output2
     }
 }
