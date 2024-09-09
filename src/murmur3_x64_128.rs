@@ -120,7 +120,7 @@ pub fn murmur3_x64_128<T: Read>(source: &mut T, seed: u32) -> Result<u128> {
     }
 }
 
-/// Use the x64 variant of the 128 bit murmur3 to hash a byte slice.
+/// Use the x64 variant of the 128 bit murmur3 to hash byte slice without copying the buffer.
 ///
 /// # Example
 /// ```

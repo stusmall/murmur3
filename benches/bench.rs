@@ -64,6 +64,14 @@ fn bench_x86_128(b: &mut Bencher) {
 }
 
 #[bench]
+fn bench_x86_128_of_slice(b: &mut Bencher) {
+    let string: &[u8] =
+        test::black_box(b"Lorem ipsum dolor sit amet, consectetur adipisicing elit");
+    b.bytes = string.len() as u64;
+    b.iter(|| murmur3_x86_128_of_slice(string, 0));
+}
+
+#[bench]
 fn bench_c_x86_128(b: &mut Bencher) {
     let string: &[u8] =
         test::black_box(b"Lorem ipsum dolor sit amet, consectetur adipisicing elit");
