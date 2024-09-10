@@ -75,7 +75,7 @@ quickcheck! {
             MurmurHash3_x86_128(xs.as_ptr() as _, xs.len() as i32,seed,output_bytes.as_ptr() as *mut _)
         };
         let output = u128::from_le_bytes(output_bytes);
-        let output2 = murmur3_x86_128_of_slice(&xs, seed).unwrap();
+        let output2 = murmur3_x86_128_of_slice(&xs, seed);
         output == output2
     }
 }
@@ -89,7 +89,7 @@ quickcheck! {
             MurmurHash3_x64_128(xs.as_ptr() as _, xs.len() as i32,seed, output_bytes.as_ptr() as *mut _)
         };
         let output = u128::from_le_bytes(output_bytes);
-        let output2 = murmur3_x64_128_of_slice(&xs, seed).unwrap();
+        let output2 = murmur3_x64_128_of_slice(&xs, seed);
         output == output2
     }
 }

@@ -164,7 +164,7 @@ pub fn murmur3_x86_128<T: Read>(source: &mut T, seed: u32) -> Result<u128> {
 /// use murmur3::murmur3_x86_128_of_slice;
 /// let hash_result = murmur3_x86_128_of_slice(b"hello world", 0);
 /// ```
-pub fn murmur3_x86_128_of_slice(source: &[u8], seed: u32) -> Result<u128> {
+pub fn murmur3_x86_128_of_slice(source: &[u8], seed: u32) -> u128 {
     const C1: u32 = 0x239b_961b;
     const C2: u32 = 0xab0e_9789;
     const C3: u32 = 0x38b3_4ae5;
@@ -241,7 +241,7 @@ pub fn murmur3_x86_128_of_slice(source: &[u8], seed: u32) -> Result<u128> {
                 h4 = h4.wrapping_add(h1);
                 let x =
                     ((h4 as u128) << 96) | ((h3 as u128) << 64) | ((h2 as u128) << 32) | h1 as u128;
-                return Ok(x);
+                return x;
             }
             _ => {
                 let read = buf.len();

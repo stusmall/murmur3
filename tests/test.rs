@@ -397,7 +397,7 @@ fn test_static_strings() {
             "Failed x86_128 chained reader on string {}",
             test.string
         );
-        let chained_hash2 = murmur3::murmur3_x86_128_of_slice(test.string.as_bytes(), 0).unwrap();
+        let chained_hash2 = murmur3::murmur3_x86_128_of_slice(test.string.as_bytes(), 0);
         assert_eq!(
             chained_hash2, expected,
             "Failed x86_128 chained reader on string {}",
@@ -415,7 +415,7 @@ fn test_static_strings() {
             test.string
         );
 
-        let chained_hash2 = murmur3::murmur3_x64_128_of_slice(test.string.as_bytes(), 0).unwrap();
+        let chained_hash2 = murmur3::murmur3_x64_128_of_slice(test.string.as_bytes(), 0);
         assert_eq!(
             chained_hash2, expected,
             "Failed x64_128 chained reader on string {}",
