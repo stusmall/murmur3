@@ -13,7 +13,9 @@ extern crate murmur3_sys;
 
 use std::io::Cursor;
 
-use murmur3::{murmur3_32, murmur3_32_of_slice};
+use murmur3::{
+    murmur3_32, murmur3_32_of_slice, murmur3_x64_128_of_slice, murmur3_x86_128_of_slice,
+};
 use murmur3_sys::MurmurHash3_x86_32;
 
 use murmur3::murmur3_x86_128;
@@ -65,7 +67,21 @@ quickcheck! {
 }
 
 quickcheck! {
-    fn quickcheck_x64_128(input:(u32, Vec<u8>)) -> bool {
+    fn quickcheck_x86_128_slice(input:(u32, Vec<u8>)) -> bool {
+        let seed = input.0;
+        let xs = input.1;
+        let output_bytes: [u8; 16] = [0; 16];
+        unsafe {
+            MurmurHash3_x86_128(xs.as_ptr() as _, xs.len() as i32,seed,output_bytes.as_ptr() as *mut _)
+        };
+        let output = u128::from_le_bytes(output_bytes);
+        let output2 = murmur3_x86_128_of_slice(&xs, seed);
+        output == output2
+    }
+}
+
+quickcheck! {
+    fn quickcheck_x64_128_slice(input:(u32, Vec<u8>)) -> bool {
         let seed = input.0;
         let xs = input.1;
         let output_bytes: [u8; 16] = [0; 16];
@@ -73,7 +89,7 @@ quickcheck! {
             MurmurHash3_x64_128(xs.as_ptr() as _, xs.len() as i32,seed, output_bytes.as_ptr() as *mut _)
         };
         let output = u128::from_le_bytes(output_bytes);
-        let output2 = murmur3_x64_128(&mut Cursor::new(xs), seed).unwrap();
+        let output2 = murmur3_x64_128_of_slice(&xs, seed);
         output == output2
     }
 }

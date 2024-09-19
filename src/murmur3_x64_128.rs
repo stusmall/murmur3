@@ -6,6 +6,7 @@
 // option. All files in the project carrying such notice may not be copied,
 // modified, or distributed except according to those terms.
 
+use std::cmp::min;
 use std::io::{Read, Result};
 use std::ops::Shl;
 
@@ -115,6 +116,123 @@ pub fn murmur3_x64_128<T: Read>(source: &mut T, seed: u32) -> Result<u128> {
             k1 = k1.rotate_left(31);
             k1 = k1.wrapping_mul(C2);
             h1 ^= k1;
+        }
+    }
+}
+
+/// Use the x64 variant of the 128 bit murmur3 to hash byte slice without copying the buffer.
+///
+/// # Example
+/// ```
+/// use murmur3::murmur3_x64_128_of_slice;
+/// let hash_result = murmur3_x64_128_of_slice(b"hello world", 0);
+/// ```
+pub fn murmur3_x64_128_of_slice(source: &[u8], seed: u32) -> u128 {
+    const C1: u64 = 0x87c3_7b91_1142_53d5;
+    const C2: u64 = 0x4cf5_ad43_2745_937f;
+    const C3: u64 = 0x52dc_e729;
+    const C4: u64 = 0x3849_5ab5;
+    const R1: u32 = 27;
+    const R2: u32 = 31;
+    const R3: u32 = 33;
+    const M: u64 = 5;
+    let mut h1: u64 = seed as u64;
+    let mut h2: u64 = seed as u64;
+    let mut buf = source;
+    let mut processed: usize = 0;
+    loop {
+        match min(buf.len(), 16) {
+            16 => {
+                processed += 16;
+
+                let k1 = u64::from_le_bytes(copy_into_array(&buf[0..8]));
+                let k2 = u64::from_le_bytes(copy_into_array(&buf[8..16]));
+                h1 ^= k1.wrapping_mul(C1).rotate_left(R2).wrapping_mul(C2);
+                h1 = h1
+                    .rotate_left(R1)
+                    .wrapping_add(h2)
+                    .wrapping_mul(M)
+                    .wrapping_add(C3);
+                h2 ^= k2.wrapping_mul(C2).rotate_left(R3).wrapping_mul(C1);
+                h2 = h2
+                    .rotate_left(R2)
+                    .wrapping_add(h1)
+                    .wrapping_mul(M)
+                    .wrapping_add(C4);
+
+                buf = &buf[16..];
+            }
+            0 => {
+                h1 ^= processed as u64;
+                h2 ^= processed as u64;
+                h1 = h1.wrapping_add(h2);
+                h2 = h2.wrapping_add(h1);
+                h1 = fmix64(h1);
+                h2 = fmix64(h2);
+                h1 = h1.wrapping_add(h2);
+                h2 = h2.wrapping_add(h1);
+                return ((h2 as u128) << 64) | (h1 as u128);
+            }
+            _ => {
+                let read = buf.len();
+                processed += read;
+
+                let mut k1 = 0;
+                let mut k2 = 0;
+                if read >= 15 {
+                    k2 ^= (buf[14] as u64).shl(48);
+                }
+                if read >= 14 {
+                    k2 ^= (buf[13] as u64).shl(40);
+                }
+                if read >= 13 {
+                    k2 ^= (buf[12] as u64).shl(32);
+                }
+                if read >= 12 {
+                    k2 ^= (buf[11] as u64).shl(24);
+                }
+                if read >= 11 {
+                    k2 ^= (buf[10] as u64).shl(16);
+                }
+                if read >= 10 {
+                    k2 ^= (buf[9] as u64).shl(8);
+                }
+                if read >= 9 {
+                    k2 ^= buf[8] as u64;
+                    k2 = k2.wrapping_mul(C2).rotate_left(33).wrapping_mul(C1);
+                    h2 ^= k2;
+                }
+                if read >= 8 {
+                    k1 ^= (buf[7] as u64).shl(56);
+                }
+                if read >= 7 {
+                    k1 ^= (buf[6] as u64).shl(48);
+                }
+                if read >= 6 {
+                    k1 ^= (buf[5] as u64).shl(40);
+                }
+                if read >= 5 {
+                    k1 ^= (buf[4] as u64).shl(32);
+                }
+                if read >= 4 {
+                    k1 ^= (buf[3] as u64).shl(24);
+                }
+                if read >= 3 {
+                    k1 ^= (buf[2] as u64).shl(16);
+                }
+                if read >= 2 {
+                    k1 ^= (buf[1] as u64).shl(8);
+                }
+                if read >= 1 {
+                    k1 ^= buf[0] as u64;
+                }
+                k1 = k1.wrapping_mul(C1);
+                k1 = k1.rotate_left(31);
+                k1 = k1.wrapping_mul(C2);
+                h1 ^= k1;
+
+                buf = &buf[read..]
+            }
         }
     }
 }
