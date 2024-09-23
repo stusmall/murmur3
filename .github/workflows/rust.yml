@@ -11,12 +11,29 @@ jobs:
       - name: Install Rust stable toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: 1.81.0 # We want to use a modern version of rust for better lints
+          toolchain: 1.81 # We want to use a modern version of rust for better lints
           components: rustfmt, clippy
       - name: Run cargo fmt
         run: cargo fmt --all -- --check
       - name: Run cargo clippy
         run: cargo clippy --all -- -D warnings
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - name: Install Rust stable toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          profile: minimal
+          # We want to check MSRV support.  Our test deps might have a higher MSRV requirement, so we have a separate
+          # step just to build on this older toolchain
+          toolchain: 1.34
+      - name: Build
+        run: cargo build
+      - name: Build no-std
+        run: cargo build --no-default-feature
   test:
     name: Test
     runs-on: ubuntu-latest
@@ -24,11 +41,9 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v4
       - name: Install Rust stable toolchain
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
-          profile: minimal
-          toolchain: 1.32 # Ensure that tests past using MSRV
-          override: true
+          toolchain: 1.81
       - name: Run cargo test
         run: cargo test
       - name: Run cargo test for no-std
