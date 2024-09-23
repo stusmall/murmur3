@@ -1,9 +1,9 @@
 [package]
 name = "murmur3-sys"
 version = "0.1.0"
-authors = ["Stu Small <stuart.small@threat-x.com>"]
+authors = ["Stu Small <stuart.alan.small@gmail.com>"]
 
 [dependencies]
 
 [build-dependencies]
-bindgen = "0.53"
+bindgen = "0.70"

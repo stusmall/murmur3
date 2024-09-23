@@ -6,11 +6,14 @@
 // option. All files in the project carrying such notice may not be copied,
 // modified, or distributed except according to those terms.
 
-use std::cmp::min;
+use crate::copy_into_array;
+use core::cmp::min;
+use core::ops::Shl;
+#[cfg(feature = "std")]
 use std::io::{Read, Result};
-use std::ops::Shl;
 
-use crate::{copy_into_array, read_bytes};
+#[cfg(feature = "std")]
+use crate::read_bytes;
 
 /// Use the x64 variant of the 128 bit murmur3 to hash some [Read] implementation.
 ///
@@ -20,6 +23,7 @@ use crate::{copy_into_array, read_bytes};
 /// use murmur3::murmur3_x64_128;
 /// let hash_result = murmur3_x64_128(&mut Cursor::new("hello world"), 0);
 /// ```
+#[cfg(feature = "std")]
 pub fn murmur3_x64_128<T: Read>(source: &mut T, seed: u32) -> Result<u128> {
     const C1: u64 = 0x87c3_7b91_1142_53d5;
     const C2: u64 = 0x4cf5_ad43_2745_937f;

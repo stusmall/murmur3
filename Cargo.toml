@@ -7,12 +7,17 @@ repository = "https://github.com/stusmall/murmur3"
 keywords = ["hash","murmur3","murmur"]
 license = "MIT/Apache-2.0"
 edition = "2018"
+rust-version = "1.32"
 
 [dependencies]
 
 [dev-dependencies]
 murmur3-sys = { path = "./murmur3-sys"}
-quickcheck = "0.9"
+quickcheck = "1.0"
+
+[features]
+default = ["std"]
+std = []
 
 [profile.bench]
 lto = true

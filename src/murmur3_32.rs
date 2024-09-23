@@ -6,9 +6,11 @@
 // option. All files in the project carrying such notice may not be copied,
 // modified, or distributed except according to those terms.
 
-use std::cmp::min;
+use core::cmp::min;
+#[cfg(feature = "std")]
 use std::io::{Read, Result};
 
+#[cfg(feature = "std")]
 use crate::read_bytes;
 
 const C1: u32 = 0x85eb_ca6b;
@@ -26,6 +28,7 @@ const N: u32 = 0xe654_6b64;
 /// use murmur3::murmur3_32;
 /// let hash_result = murmur3_32(&mut Cursor::new("hello world"), 0);
 /// ```
+#[cfg(feature = "std")]
 pub fn murmur3_32<T: Read>(source: &mut T, seed: u32) -> Result<u32> {
     let mut buffer: [u8; 4] = [0; 4];
     let mut processed = 0;

@@ -29,7 +29,7 @@ fn bench_32_slice(b: &mut Bencher) {
     b.bytes = string.len() as u64;
     b.iter(|| {
         let tmp = &string[0..string.len()];
-        murmur3_32_of_slice(tmp, 0);
+        murmur3_32_of_slice(tmp, 0)
     });
 }
 

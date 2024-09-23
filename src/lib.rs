@@ -8,11 +8,16 @@
 
 //! A pure rust implementation of the fast, non-cryptographic hash [murmur3](https://en.wikipedia.org/wiki/MurmurHash)
 #![deny(missing_docs)]
+#![no_std]
+
+#[cfg(feature = "std")]
+extern crate std;
 
 mod murmur3_32;
 mod murmur3_x64_128;
 mod murmur3_x86_128;
 
+#[cfg(feature = "std")]
 use std::io::{ErrorKind, Read, Result};
 
 pub use self::murmur3_32::*;
@@ -33,6 +38,7 @@ where
 /// caused by Chain.
 ///
 /// Errors: See `std::io::Read`.
+#[cfg(feature = "std")]
 fn read_bytes<R>(source: &mut R, buf: &mut [u8]) -> Result<usize>
 where
     R: Read,
