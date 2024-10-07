@@ -6,8 +6,8 @@ description = "A rust implementation of Murmur3 hash"
 repository = "https://github.com/stusmall/murmur3"
 keywords = ["hash","murmur3","murmur"]
 license = "MIT/Apache-2.0"
-edition = "2018"
-rust-version = "1.32"
+edition = "2021"
+rust-version = "1.60"
 
 [dependencies]
 
