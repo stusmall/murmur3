@@ -29,11 +29,11 @@ jobs:
           profile: minimal
           # We want to check MSRV support.  Our test deps might have a higher MSRV requirement, so we have a separate
           # step just to build on this older toolchain
-          toolchain: 1.60
+          toolchain: 1.60.0
       - name: Build
         run: cargo build
       - name: Build no-std
-        run: cargo build --no-default-feature
+        run: cargo build --no-default-features
   test:
     name: Test
     runs-on: ubuntu-latest
@@ -47,4 +47,4 @@ jobs:
       - name: Run cargo test
         run: cargo test
       - name: Run cargo test for no-std
-        run: cargo test --no-default-feature
+        run: cargo test --no-default-features
