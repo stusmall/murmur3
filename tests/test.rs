@@ -375,6 +375,27 @@ fn test_static_strings() {
             test.string,
         );
 
+        assert_eq!(
+            murmur3::murmur3_32_of_slices(&[test.string.as_bytes()], 0),
+            test.hash_32,
+            "Failed 32_of_slice on string {}",
+            test.string,
+        );
+
+        // dealing with multiple unaligned buffers is the tricky part, let's test all the cases
+        for i in 0..=test.string.len() {
+            let mut full_slice = test.string.as_bytes();
+            if let Some(first) = full_slice.split_off(..i) {
+                assert_eq!(
+                    murmur3::murmur3_32_of_slices(&[first, full_slice], 0),
+                    test.hash_32,
+                    "Failed 32_of_slices on string {}, split in {}",
+                    test.string,
+                    i,
+                );
+            }
+        }
+
         let mut string = String::new();
         str_as_chained_cursor(test.string)
             .read_to_string(&mut string)

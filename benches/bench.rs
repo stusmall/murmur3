@@ -34,6 +34,18 @@ fn bench_32_slice(b: &mut Bencher) {
 }
 
 #[bench]
+fn bench_32_slices(b: &mut Bencher) {
+    let string: &[u8] =
+        test::black_box(b"Lorem ipsum dolor sit amet, consectetur adipisicing elit");
+
+    b.bytes = string.len() as u64;
+    b.iter(|| {
+        let tmp = &string[0..string.len()];
+        murmur3_32_of_slices(&[tmp], 0);
+    });
+}
+
+#[bench]
 fn bench_c_32(b: &mut Bencher) {
     let string: &[u8] =
         test::black_box(b"Lorem ipsum dolor sit amet, consectetur adipisicing elit");

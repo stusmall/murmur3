@@ -111,6 +111,112 @@ pub fn murmur3_32_of_slice(source: &[u8], seed: u32) -> u32 {
     }
 }
 
+/// Use the 32 bit variant of murmur3 to hash [[u8],..] without copying the buffers.
+///
+/// # Example
+///
+/// ```
+/// use murmur3::murmur3_32_of_slices;
+/// let hash_result = murmur3_32_of_slices(&["hello".as_bytes()," world".as_bytes()], 0);
+/// ```
+pub fn murmur3_32_of_slices(source: &[&[u8]], seed: u32) -> u32 {
+    let mut state = seed;
+    let mut processed:usize = 0;
+    let mut k: u32=0u32;
+    let mut k_offset: u8=0u8;
+    for slice in source {
+        let mut buffer = *slice;
+        let mut buffer_len = buffer.len();
+        processed += buffer_len;
+        while buffer_len != 0 {
+            match k_offset {
+                0 => {
+                    match buffer_len {
+                        3 => {
+                            k |= (buffer[2] as u32) << 16 | (buffer[1] as u32) << 8 | (buffer[0] as u32);
+                            buffer = &buffer[3..];
+                            k_offset = 3;
+                        },
+                        2 => {
+                            k |= (buffer[1] as u32) << 8 | (buffer[0] as u32);
+                            buffer = &buffer[2..];
+                            k_offset = 2;
+                        },
+                        1 => {
+                            k |= buffer[0] as u32;
+                            buffer = &buffer[1..];
+                            k_offset = 1;
+                        },
+                        _ => {
+                            k = ((buffer[3] as u32) << 24)
+                                | ((buffer[2] as u32) << 16)
+                                | ((buffer[1] as u32) << 8)
+                                | (buffer[0] as u32);
+                            buffer = &buffer[4..];
+                            k_offset = 0;
+                        }
+                    }
+                },
+                1 => {
+                    match buffer_len {
+                        2 => {
+                            k |= (buffer[1] as u32) << 16 | (buffer[0] as u32) <<8;
+                            buffer = &buffer[2..];
+                            k_offset = 3;
+                        },
+                        1 => {
+                            k |= (buffer[0] as u32)<<8;
+                            buffer = &buffer[1..];
+                            k_offset = 2;
+                        },
+                        _ => {
+                            k |= (buffer[2] as u32) << 24 | (buffer[1] as u32) << 16 | (buffer[0] as u32) <<8;
+                            buffer = &buffer[3..];
+                            k_offset = 0;
+                        },
+                    }
+                },
+                2 => {
+                    match buffer_len {
+                        1 => {
+                            k |= (buffer[0] as u32)<<16;
+                            buffer = &buffer[1..];
+                            k_offset = 3;
+                        },
+                        _ => {
+                            k |= (buffer[1] as u32) << 24 | (buffer[0] as u32)<<16;
+                            buffer = &buffer[2..];
+                            k_offset = 0;
+                        },
+                    }
+                },
+                3 => {
+                    k |= (buffer[0] as u32)<<24;
+                    buffer = &buffer[1..];
+                    k_offset = 0;
+                    }
+                _ => unreachable!()
+            }
+
+            if k_offset == 0 {
+                // all 4-bytes ware collected
+                state ^= calc_k(k);
+                state = state.rotate_left(R2);
+                state = (state.wrapping_mul(M)).wrapping_add(N);
+                k = 0u32;
+            }
+            buffer_len = buffer.len();
+        }
+    }
+
+    if k_offset != 0 {
+        // k still has some unprocessed data
+        state ^= calc_k(k);
+    }
+
+    finish(state, processed as u32)
+}
+
 fn finish(state: u32, processed: u32) -> u32 {
     let mut hash = state;
     hash ^= processed;
